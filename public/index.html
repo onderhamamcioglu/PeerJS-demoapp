@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PeerJS Video Chat</title>
+</head>
+<body>
+<h1>PeerJS Video Chat</h1>
+<p>Your Peer ID: <span id="peer-id"></span></p>
+<video id="local-video" autoplay></video>
+<video id="remote-video" autoplay></video>
+<script src="./peerjs/dist/peerjs.js"></script>
+<script type = "module">
+    const localVideo = document.getElementById('local-video');
+    const remoteVideo = document.getElementById('remote-video');
+    const peerIdSpan = document.getElementById('peer-id');
+    const peer = new Peer(undefined, {
+        host: 'localhost',
+        port: 9000,
+        path: '/',
+    });
+
+    peer.on('open', (id) => {
+        peerIdSpan.textContent = id;
+    });
+
+
+    navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+        .then((stream) => {
+            localVideo.srcObject = stream;
+            peer.on('call', (call) => {
+                call.answer(stream);
+                call.on('stream', (remoteStream) => {
+                    remoteVideo.srcObject = remoteStream;
+                });
+            });
+            const callPeer = () => {
+                const remotePeerId = prompt('Enter the peer ID to call:');
+                if (remotePeerId) {
+                    const call = peer.call(remotePeerId, stream);
+                    call.on('stream', (remoteStream) => {
+                        remoteVideo.srcObject = remoteStream;
+                    });
+                }
+            };
+
+            document.getElementById('call-button').addEventListener('click', callPeer);
+        })
+        .catch((error) => {
+            console.error('Error accessing user media:', error);
+        });
+</script>
+<button id="call-button">Call Peer</button>
+</body>
+</html>
