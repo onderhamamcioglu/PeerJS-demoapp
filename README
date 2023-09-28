@@ -1,6 +1,6 @@
 This is a simple implementation of peerjs library.
 
-## How to run
+##How to run
 
 - Run peerjs server on docker with `$ docker run -p 9000:9000 -d peerjs/peerjs-server`
 - Run project with `node server.js` , then you can access project at http://localhost:3000
